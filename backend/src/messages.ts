@@ -1,4 +1,13 @@
-export const MAKE_ROOM = "make_room";
-export const JOIN_ROOM = "join_room";
-export const INIT_GAME = "init_game";
-export const MAKE_MOVE = "make_move";
+export const MAKE_ROOM = "makeRoom";
+export const JOIN_ROOM = "joinRoom";
+export const INIT_GAME = "initGame";
+export const MAKE_MOVE = "makeMove";
+export const MOVE_ACK_AND_RESULT = "moveAckAndResult";
+export const MOVE_ACK = "moveAck";
+export const CONNECTION_DISRUPT = "connectionDisrupt";
+export const HOST_DISCONNECTED = "roomDisbandByHost";
+export const GUEST_DISCONNECTED = "guestDisconnected";
+export const INVALID_ROOM_ID = 'inValidRoomId';
+export const NEW_GAME = "newGame";
+export const REQ_NEW_GAME = "reqNewGame";
+export const PLAYER_DISCONNECTED = 'playerDisconnected';

@@ -1,33 +1,44 @@
 import { WebSocket } from "ws";
+import { CONNECTION_DISRUPT, MOVE_ACK, MOVE_ACK_AND_RESULT,  } from "./messages.js";
 
 export default class Game {
     public player1: null | WebSocket;
     public player2: null | WebSocket;
     private gameState : (number | null)[];
     private moveCounter: number;
-    private p1s: 1 | 0;
-    private p2s: 1 | 0;
+    private gameCounter: number;
+    public isGameOn: boolean;
 
-    constructor(ws1:WebSocket, ws2:WebSocket, p1s:1 | 0, p2s:1 | 0){
+    constructor(ws1:WebSocket, ws2:WebSocket){
         this.player1 = ws1;
         this.player2 = ws2;
-        this.p1s = p1s
-        this.p2s = p2s
         this.gameState = new Array(9).fill(null);
-        this.initialCall()
         this.moveCounter = 0
+        this.gameCounter = 1
+        this.isGameOn = true;
+        this.initialCall()
     }
 
     initialCall() {
         this.player1?.send(JSON.stringify({
-            message: `you are ${this.p1s}.`,
+            gameCount: this.gameCounter,
             gameState: this.gameState
         }));
         this.player2?.send(JSON.stringify({
-            message: `you are ${this.p2s}.`,
+            gameCount: this.gameCounter,
             gameState: this.gameState
         }));
         
+    }
+
+    newGame() {
+        if (!this.isGameOn) {
+            return
+        }
+        this.gameState = new Array(9).fill(null);
+        this.gameCounter += 1
+        this.moveCounter = 0
+        this.initialCall()
     }
 
     isGameOver():(WebSocket | null) {
@@ -41,7 +52,7 @@ export default class Game {
             (tem[2] === 1 && tem[5] === 1 && tem[8] === 1) ||
             (tem[2] === 1 && tem[4] === 1 && tem[6] === 1)
         ) {
-            return this.p1s === 1 ? this.player1 : this.player2
+            return this.player1
         } else if ((tem[0] === 0 && tem[1] === 0 && tem[2] === 0) ||
             (tem[0] === 0 && tem[4] === 0 && tem[8] === 0) || 
             (tem[0] === 0 && tem[3] === 0 && tem[6] === 0) ||
@@ -51,13 +62,15 @@ export default class Game {
             (tem[2] === 0 && tem[5] === 0 && tem[8] === 0) ||
             (tem[2] === 0 && tem[4] === 0 && tem[6] === 0)
         ) {
-            return this.p1s === 0 ? this.player1 : this.player2
+            return this.player2
         } else {
             return null
         } 
     }
 
     makeMove(ws:WebSocket,move:number) {
+        if (this.isGameOn) return;
+
         if (move < 0 || 8 < move) {
             console.log("return from game makeMove buz move out of bound",move)
             return
@@ -67,16 +80,25 @@ export default class Game {
         } else if (this.isGameOver() === this.player1 || this.isGameOver() === this.player2) {
             console.log(`return from game makeMove buz game is over, winner is ${this.isGameOver() === this.player1 ? 'player1 "X"':'player2 "O"'}.`)
             return
-        } else if (this.moveCounter % 2 !== 0 && ws === this.player1) {
-            console.log("return from game makemove buz move mismatch",ws,this.moveCounter)
-            return
+        } else {
+            if (this.gameCounter % 2 !== 0) {
+                if ((this.moveCounter % 2 !== 0 && ws === this.player1) || (this.moveCounter % 2 === 0 && ws === this.player2)) {
+                    console.log("return from game makemove buz move mismatch",ws,this.moveCounter)
+                    return
+                }
+            } else {
+                if ((this.moveCounter % 2 !== 0 && ws === this.player2) || (this.moveCounter % 2 === 0 && ws === this.player1)) {
+                    console.log("return from game makemove buz move mismatch",ws,this.moveCounter)
+                    return
+                }
+            }
         }
 
         try {
             if (this.player1 === ws) {
-                this.gameState[move] = this.p1s
+                this.gameState[move] = 1
             } else if (this.player2 === ws) {
-                this.gameState[move] = this.p2s
+                this.gameState[move] = 0
             };
         } catch (err) {
             console.log("try and catch from game makeMove", err)
@@ -88,7 +110,7 @@ export default class Game {
         const isGameOver = this.isGameOver()
         if (isGameOver || this.moveCounter === 9) {
             const payload = JSON.stringify({
-                type: "moveAckAndResult",
+                type: MOVE_ACK_AND_RESULT,
                 totalMove: this.moveCounter,
                 gameState: this.gameState,
                 resultType: isGameOver ? "win": "draw",
@@ -99,7 +121,7 @@ export default class Game {
             this.player2?.send(payload);
         } else {
             const payload = JSON.stringify({
-                type: "moveAck",
+                type: MOVE_ACK,
                 totalMove: this.moveCounter,
                 gameState: this.gameState
             });
@@ -110,6 +132,11 @@ export default class Game {
     }
 
     handleDisconnect(ws:WebSocket) {
-        
+        if (this.player1 === ws) {
+            const payload = JSON.stringify({
+                type: CONNECTION_DISRUPT,
+            })
+            this.player2?.send(payload);
+        }
     }
 }
