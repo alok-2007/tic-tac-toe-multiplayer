@@ -1,5 +1,5 @@
 import { WebSocket } from "ws";
-import { CONNECTION_DISRUPT, MOVE_ACK, MOVE_ACK_AND_RESULT,  } from "./messages.js";
+import { MOVE_ACK, MOVE_ACK_AND_RESULT, PLAYER_DISCONNECTED,  } from "./messages.js";
 
 export default class Game {
     public player1: null | WebSocket;
@@ -134,9 +134,16 @@ export default class Game {
     handleDisconnect(ws:WebSocket) {
         if (this.player1 === ws) {
             const payload = JSON.stringify({
-                type: CONNECTION_DISRUPT,
+                type: PLAYER_DISCONNECTED,
             })
             this.player2?.send(payload);
+            return
+        } else if (this.player2 === ws) {
+            const payload = JSON.stringify({
+                type: PLAYER_DISCONNECTED,
+            })
+            this.player1?.send(payload);
+            return
         }
     }
 }

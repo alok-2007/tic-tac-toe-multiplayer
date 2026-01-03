@@ -1,6 +1,6 @@
 import Game from "./Game.js"
 import { WebSocket } from "ws"
-import { GUEST_DISCONNECTED, HOST_DISCONNECTED, INVALID_ROOM_ID, REQ_NEW_GAME } from "./messages.js";
+import { GUEST_DISCONNECTED, HALT_GAME, HOST_DISCONNECTED, INVALID_ROOM_ID, REQ_NEW_GAME, WAIT_FOR_OPPONENT } from "./messages.js";
 
 type Room = {
     host: WebSocket,
@@ -14,10 +14,11 @@ type ReqRoom = {
 
 export function generateRamdomId(length=6):string{
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXZYabcdefghijklmnopqrstuvwxzy123456890";
+    const charsLen = chars.length;
     let result:string = "";
     for(let i = 0; i < length; i++) {
         const randomNum = Math.floor(Math.random() * 1000) + 1
-        result += chars[randomNum % length];
+        result += chars[randomNum % charsLen];
     }
     return result;
 } 
@@ -31,6 +32,11 @@ export default class GameManager {
     initGame(ws:WebSocket) {
         if (!this.pendingUser) {
             this.pendingUser = ws
+            this.pendingUser.send(JSON.stringify({
+                type: WAIT_FOR_OPPONENT,
+                message: "wait for opponent",
+            }))
+            return;
         } else {
             const newGame = new Game(this.pendingUser, ws)
             this.games.push(newGame)
@@ -134,6 +140,23 @@ export default class GameManager {
                 reqester: ws,
                 reqId: reqRoomId
             }))
+        }
+    }
+
+    stopGame(ws:WebSocket) {
+        const game = this.games.find(game => game.player1 === ws || game.player2 === ws);
+        if (!game) return;
+        game.isGameOn = false;
+        if (game.player1 === ws) {
+            game.player2?.send(JSON.stringify({
+                type: HALT_GAME
+            }))
+            return
+        } else if (game.player2 === ws) {
+            game.player1?.send(JSON.stringify({
+                type: HALT_GAME
+            }))
+            return
         }
     }
 
