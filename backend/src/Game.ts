@@ -1,5 +1,5 @@
 import { WebSocket } from "ws";
-import { MOVE_ACK, MOVE_ACK_AND_RESULT, PLAYER_DISCONNECTED,  } from "./messages.js";
+import { MOVE_ACK, MOVE_ACK_AND_RESULT, PLAYER_DISCONNECTED, INITIAL_CALL  } from "./messages.js";
 
 export default class Game {
     public player1: null | WebSocket;
@@ -21,12 +21,16 @@ export default class Game {
 
     initialCall() {
         this.player1?.send(JSON.stringify({
+            type: INITIAL_CALL,
             gameCount: this.gameCounter,
-            gameState: this.gameState
+            totalMove: this.moveCounter,
+            p1OrP2: "p1"
         }));
         this.player2?.send(JSON.stringify({
+            type: INITIAL_CALL,
             gameCount: this.gameCounter,
-            gameState: this.gameState
+            totalMove: this.moveCounter,
+            p1OrP2: "p2"
         }));
         
     }
@@ -123,7 +127,8 @@ export default class Game {
             const payload = JSON.stringify({
                 type: MOVE_ACK,
                 totalMove: this.moveCounter,
-                gameState: this.gameState
+                gameState: this.gameState,
+                move: move
             });
 
             this.player1?.send(payload);

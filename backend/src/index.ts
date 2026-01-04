@@ -32,7 +32,6 @@ wss.on("connection", (ws:WebSocket) => {
             case STOP_GAME:
                 gamemanager.stopGame(ws);
                 break;
-            
         }
         console.log("after switch complete")
     })

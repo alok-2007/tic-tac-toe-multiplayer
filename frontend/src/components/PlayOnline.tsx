@@ -3,6 +3,7 @@ import NavBar from "./NavBar";
 import Board from "./Board";
 import { INIT_GAME } from "../messages";
 
+
 type Ws = null | WebSocket;
 
 export default function PlayOnline(){
@@ -19,22 +20,16 @@ export default function PlayOnline(){
         }
 
         setWs(socket);
-
+        return () => {
+            socket.close();
+        }
     }, [])
-
-    if (!ws) {
-        return (
-            <div>loading...</div>
-        )
-    }
 
     return (
         <div>
-            <NavBar isGameOn={isGameOn} />
-            <div>
-                <div>
-                    <Board ws={ws} />
-                </div>
+            <NavBar isGameOn={isGameOn}/>
+            <div className="bg-red-400">
+                <Board ws={ws} setIsGameOn={setIsGameOn}/>
             </div>
         </div>
     )

@@ -13,3 +13,4 @@ export const PLAYER_DISCONNECTED = 'playerDisconnected';
 export const STOP_GAME = 'stopGame';
 export const HALT_GAME = 'haltGame';
 export const WAIT_FOR_OPPONENT = "waitForOpponent";
+export const INITIAL_CALL = 'initialCall'

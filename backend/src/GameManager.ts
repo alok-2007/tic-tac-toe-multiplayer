@@ -49,49 +49,59 @@ export default class GameManager {
             this.pendingUser = null
             return
         }
-        const hostFound = Array();
-        const guestFound = Array();
-        this.rooms.forEach((value:Room,key:string) => {
-            if (value.host === ws) {
-                hostFound.push([value,key])
-                return
-            } else if (value.guest === ws) {
-                guestFound.push([value, key])
-                return
-            }
-        });
 
-        if (hostFound) {
-            this.rooms.delete(hostFound[1])
-            const guest:WebSocket = hostFound[0].guest
-            guest?.send(JSON.stringify({
-                type: HOST_DISCONNECTED,
-                message: "host disconnected",
-            }))
-            this.games = this.games.filter(game => game.player1 !== guest || game.player2 !== guest)
-            return
+        const roomLen = this.rooms.size;
 
-        } else if (guestFound) {
-            const roomId = guestFound[1]
-            const host:WebSocket = guestFound[0].host;
-            const room = this.rooms.get(roomId)
-            if (room) {
+        if (roomLen > 0) {
+            const hostFound: [Room, string][] = [];
+            const guestFound: [Room, string][] = [];
+
+            this.rooms.forEach((value:Room,key:string) => {
+                if (value.host === ws) {
+                    hostFound.push([value, key])
+                    return
+                } else if (value.guest === ws) {
+                    guestFound.push([value, key])
+                    return
+                }
+            });
+
+            if (hostFound.length > 0) {
+                const entry = hostFound[0]
+                if (!entry) return;
+                const [room, roomId] = entry;
+                this.rooms.delete(roomId)
+                const guest:WebSocket | null = room.guest
+                guest?.send(JSON.stringify({
+                    type: HOST_DISCONNECTED,
+                    message: "host disconnected",
+                }))
+                this.games = this.games.filter(game => game.player1 !== guest && game.player2 !== guest)
+                return
+            } else if (guestFound.length > 0) {
+                const entry = hostFound[0];
+                if (!entry) return;
+
+                const [room, roomId] = entry;
+                
                 this.rooms.set(roomId, {
                     host: room.host,
                     guest: null,
                 })
-            }
-            room?.host.send(JSON.stringify({
-                type: GUEST_DISCONNECTED,
-                message: "guest disconnected",
-            }))
-            this.games = this.games.filter(game => game.player1 !== host && game.player2 !== host)
-            return
-        } else {
-            this.games = this.games.filter(game => game.player1 !== ws && game.player2 !== ws)
-            const game = this.games.filter(game => game.player1 === ws || game.player2 === ws)[0]
-            game?.handleDisconnect(ws)
+
+                room?.host.send(JSON.stringify({
+                    type: GUEST_DISCONNECTED,
+                    message: "guest disconnected",
+                }))
+                this.games = this.games.filter(game => game.player1 !== room.host && game.player2 !== room.host)
+                return
+            } 
         }
+
+        const game = this.games.find(game => game.player1 === ws || game.player2 === ws)
+        game?.handleDisconnect(ws)
+
+        this.games = this.games.filter(g => g !== game)
     }
 
     makeMove(ws:WebSocket, move:number) {

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 type NavBarPropType = {
     isGameOn: boolean;
@@ -7,8 +8,12 @@ type NavBarPropType = {
 
 export default function NavBar({isGameOn}: NavBarPropType) {
     const navigate = useNavigate();
+    const location = useLocation();
     const [conf, setConf] = useState(false);
     const [action, setAction] = useState<"online" | "offline" | "room" | null>(null);
+    const pathname = location.pathname.slice(1,);
+
+    console.log(pathname);
 
     function handleNavClick(type:"online" | "offline" | "room") {
         if (isGameOn) {
@@ -31,10 +36,10 @@ export default function NavBar({isGameOn}: NavBarPropType) {
 
     return (
         <>
-            <div>
-                <button onClick={() => handleNavClick("online")}>Play Online</button>
-                <button onClick={() => handleNavClick("offline")}>Play Offline</button>
-                <button onClick={() => handleNavClick("room")}>Play Room</button>
+            <div className="flex mx-auto gap-4 mb-4">
+                <button className={`cursor-pointer border rounded py-1 px-3 ${pathname === "play-online" ? "bg-red-900 text-white":"bg-yellow-400 text-black"}` } onClick={() => handleNavClick("online")}>Play Online</button>
+                <button className={`cursor-pointer border rounded py-1 px-3 ${pathname === "play-offline" ? "bg-red-900 text-white":"bg-yellow-400 text-black"}` } onClick={() => handleNavClick("offline")}>Play Offline</button>
+                <button className={`cursor-pointer border rounded py-1 px-3 ${pathname === "play-room" ? "bg-red-900 text-white":"bg-yellow-400 text-black"}` } onClick={() => handleNavClick("room")}>Play Room</button>
             </div>
             {conf && (
                 <div>
