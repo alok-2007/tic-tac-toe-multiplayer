@@ -36,10 +36,10 @@ export default function NavBar({isGameOn}: NavBarPropType) {
 
     return (
         <>
-            <div className="flex mx-auto gap-4 mb-4">
-                <button className={`cursor-pointer border rounded py-1 px-3 ${pathname === "play-online" ? "bg-red-900 text-white":"bg-yellow-400 text-black"}` } onClick={() => handleNavClick("online")}>Play Online</button>
-                <button className={`cursor-pointer border rounded py-1 px-3 ${pathname === "play-offline" ? "bg-red-900 text-white":"bg-yellow-400 text-black"}` } onClick={() => handleNavClick("offline")}>Play Offline</button>
-                <button className={`cursor-pointer border rounded py-1 px-3 ${pathname === "play-room" ? "bg-red-900 text-white":"bg-yellow-400 text-black"}` } onClick={() => handleNavClick("room")}>Play Room</button>
+            <div className="nav-bar">
+                <button className={`${pathname === "play-online" ? "nav-btn-selected" : "nav-btn"}`} onClick={() => handleNavClick("online")}>Play Online</button>
+                <button className={`${pathname === "play-offline" ? "nav-btn-selected" : "nav-btn"}`} onClick={() => handleNavClick("offline")}>Play Offline</button>
+                <button className={`${pathname === "play-room" ? "nav-btn-selected" : "nav-btn"}`} onClick={() => handleNavClick("room")}>Play Room</button>
             </div>
             {conf && (
                 <div>

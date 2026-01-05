@@ -13,12 +13,12 @@ wss.on("connection", (ws:WebSocket) => {
         console.log("after payload")
         switch (payload.type) {
             case INIT_GAME:
-                console.log("before call in init_game switch")
                 gamemanager.initGame(ws);
-                console.log("after call in init_game switch")
                 break;
             case MAKE_ROOM:
+                console.log("before make move")
                 gamemanager.makeRoom(ws);
+                console.log("after make move")
                 break;
             case JOIN_ROOM:
                 gamemanager.joinRoom(ws, payload.roomId);

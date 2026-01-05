@@ -26,11 +26,11 @@ export default function PlayOnline(){
     }, [])
 
     return (
-        <div>
+        <>
             <NavBar isGameOn={isGameOn}/>
-            <div className="bg-red-400">
+            <div className="board">
                 <Board ws={ws} setIsGameOn={setIsGameOn}/>
             </div>
-        </div>
+        </>
     )
 }

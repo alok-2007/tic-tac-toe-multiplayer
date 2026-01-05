@@ -1,0 +1,159 @@
+.outer-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: black;
+}
+
+.main-container{
+    background-color: burlywood;
+    display: grid;
+    grid-template-columns: 30vw;
+    grid-template-rows: 3fr 1.5fr 20fr;
+    grid-template-areas: 
+        "header"
+        "navbar"
+        "board";
+    min-height: 60vh;
+}
+
+header {
+    grid-area: header;
+    background-color: steelblue;
+    color: black;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.nav-bar {
+    grid-area: navbar;
+    background-color: brown;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.nav-btn-selected {
+    display: flex;
+    font-size: 1.2em;
+    background-color: yellow;
+    color: black;
+    padding: 2px 5px;
+    border: 1px solid white;
+    border-radius: 8px;
+}
+
+.nav-btn {
+    display: flex;
+    font-size: 1.2em;
+    background-color: red;
+    color: white;
+    padding: 2px 10px;
+    border: 1px solid black;
+    border-radius: 8px;
+}
+
+.board {
+    grid-area: board;
+    background-color: rgb(8, 8, 52);
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 3fr 2fr 15fr;
+    grid-template-areas: 
+        "gameStatus"
+        "players-display"
+        "main-board";
+
+}
+
+.game-status {
+    grid-area: gameStatus;
+    background-color: rgb(255, 255, 0);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 35px;
+}
+
+.players {
+    grid-area: players-display;
+    background-color: rgb(214, 131, 145);
+    display: flex;
+    padding-left: 2vw;
+    padding-right: 2vw;
+    justify-content: space-between;
+}
+
+.player1 {
+    flex: 3;
+    background-color: beige;
+    display: flex;
+    font-size: 22px;
+}
+
+.name1 {
+    flex: 3;
+}
+
+.pointer1 {
+    flex: 1;
+}
+
+.divider {
+    flex: 1;
+    background-color: black;
+}
+
+.player2 {
+    flex: 3;
+    background-color: beige;
+    font-size: 22px;
+    display: flex;
+}
+
+.name2 {
+    flex: 3;
+}
+
+.pointer2 {
+    flex: 1;
+}
+
+
+.main-board {
+    grid-area: main-board;
+    background-color: rgb(8, 8, 52);
+    display: grid;
+    width: 80%;
+    aspect-ratio: 1/1;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    
+    grid-template-areas:
+        "row-0"
+        "row-1"
+        "row-2";
+    
+    gap: 5px;
+    margin: 1em auto;
+}
+
+.row-0,
+.row-1,
+.row-2 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:5px
+}
+
+.square {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 5em;
+}

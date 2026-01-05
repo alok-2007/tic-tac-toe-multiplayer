@@ -45,7 +45,7 @@ export default class Game {
         this.initialCall()
     }
 
-    isGameOver():(WebSocket | null) {
+    isGameOver():("p1" |"p2" | null) {
         const tem = this.gameState
         if ((tem[0] === 1 && tem[1] === 1 && tem[2] === 1) ||
             (tem[0] === 1 && tem[4] === 1 && tem[8] === 1) || 
@@ -56,7 +56,7 @@ export default class Game {
             (tem[2] === 1 && tem[5] === 1 && tem[8] === 1) ||
             (tem[2] === 1 && tem[4] === 1 && tem[6] === 1)
         ) {
-            return this.player1
+            return "p1";
         } else if ((tem[0] === 0 && tem[1] === 0 && tem[2] === 0) ||
             (tem[0] === 0 && tem[4] === 0 && tem[8] === 0) || 
             (tem[0] === 0 && tem[3] === 0 && tem[6] === 0) ||
@@ -66,14 +66,14 @@ export default class Game {
             (tem[2] === 0 && tem[5] === 0 && tem[8] === 0) ||
             (tem[2] === 0 && tem[4] === 0 && tem[6] === 0)
         ) {
-            return this.player2
+            return "p2";
         } else {
             return null
         } 
     }
 
     makeMove(ws:WebSocket,move:number) {
-        if (this.isGameOn) return;
+        if (!this.isGameOn) return;
 
         if (move < 0 || 8 < move) {
             console.log("return from game makeMove buz move out of bound",move)
@@ -118,7 +118,7 @@ export default class Game {
                 totalMove: this.moveCounter,
                 gameState: this.gameState,
                 resultType: isGameOver ? "win": "draw",
-                winner: isGameOver
+                winner: isGameOver,
             });
 
             this.player1?.send(payload);
